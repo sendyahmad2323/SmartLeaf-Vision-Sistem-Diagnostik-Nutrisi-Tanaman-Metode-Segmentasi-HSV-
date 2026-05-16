@@ -1,164 +1,370 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Statistik - SmartLeaf</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Dashboard SmartLeaf Vision</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+          rel="stylesheet">
+
     <style>
-        body { background-color: #f4f7f6; font-family: 'Segoe UI', Tahoma, sans-serif; }
-        .card-custom { border-radius: 15px; border: none; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+
+        body{
+            background:#f4f6f9;
+            font-family:Arial, sans-serif;
+        }
+
+        .navbar{
+            background:#1b5e20;
+        }
+
+        .navbar-brand{
+            color:white;
+            font-weight:bold;
+            font-size:24px;
+        }
+
+        .card-box{
+            border:none;
+            border-radius:15px;
+            box-shadow:0 3px 12px rgba(0,0,0,0.1);
+        }
+
+        .table img{
+            border-radius:10px;
+        }
+
+        .badge-score{
+            font-size:16px;
+            padding:8px 15px;
+        }
+
+        .title-page{
+            color:#1b5e20;
+            font-weight:bold;
+        }
+
+        .evaluation-card{
+            border:none;
+            border-radius:15px;
+            color:white;
+            text-align:center;
+            box-shadow:0 3px 12px rgba(0,0,0,0.1);
+        }
+
+        .evaluation-card h2{
+            font-weight:bold;
+        }
+
+        .bg-accuracy{
+            background:#2e7d32;
+        }
+
+        .bg-precision{
+            background:#1565c0;
+        }
+
+        .bg-recall{
+            background:#f9a825;
+        }
+
+        .bg-f1{
+            background:#c62828;
+        }
+
+        .table thead{
+            background:#43a047;
+            color:white;
+        }
+
     </style>
+
 </head>
 <body>
 
-<nav class="navbar navbar-expand-lg navbar-dark shadow-sm mb-4" style="background-color: #1b5e20;">
+<!-- NAVBAR -->
+
+<nav class="navbar navbar-dark mb-4">
+
     <div class="container">
-        <a class="navbar-brand fw-bold" href="/"><i class="bi bi-tree-fill"></i> SmartLeaf</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ms-auto">
-                <li class="nav-item"><a class="nav-link fw-bold" href="/">Pemindai AI</a></li>
-                <li class="nav-item"><a class="nav-link active fw-bold" href="/dashboard/">Data & Statistik</a></li>
-            </ul>
-        </div>
+
+        <span class="navbar-brand">
+
+            🌿 SmartLeaf Vision Dashboard
+
+        </span>
+
     </div>
+
 </nav>
 
+
 <div class="container">
-    <h2 class="text-success fw-bold mb-4"><i class="bi bi-bar-chart-fill"></i> Panel Statistik & Database</h2>
 
-    {% if messages %}
-        {% for message in messages %}
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                <i class="bi bi-check-circle-fill me-2"></i> {{ message }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        {% endfor %}
-    {% endif %}
-    
-    <div class="row">
-        <div class="col-md-4 mb-4">
-            <div class="card card-custom p-4 h-100">
-                <h5 class="fw-bold text-center mb-4 border-bottom pb-2">Distribusi Kondisi</h5>
-                <canvas id="grafikTanaman"></canvas>
-            </div>
+    <!-- TITLE -->
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <div>
+
+            <h2 class="title-page">
+
+                Hasil Diagnostik Nutrisi Daun
+
+            </h2>
+
+            <p>
+                Dataset Kaggle Segmentasi HSV
+            </p>
+
         </div>
 
-        <div class="col-md-8 mb-4">
-            <div class="card card-custom p-4 h-100">
-                <h5 class="fw-bold mb-3 border-bottom pb-2">Riwayat Pengujian Terakhir</h5>
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle" style="font-size: 0.9rem;">
-                        <thead class="table-success">
-                            <tr>
-                                <th>Tanggal</th>
-                                <th>File Citra</th>
-                                <th>Status Diagnosa</th>
-                                <th>Rincian Ekstraksi Warna</th> <th>Catatan Tambahan</th>
-                                <th class="text-center">Aksi (CRUD)</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for data in riwayat %}
-                            <tr>
-                                <td class="text-muted">{{ data.tanggal_uji|date:"d M Y" }}</td>
-                                <td class="fw-bold">{{ data.nama_file }}</td>
-                                <td>
-                                    {% if "Sehat" in data.status_daun %}
-                                        <span class="badge bg-success"><i class="bi bi-check-circle"></i> Sehat</span>
-                                    {% elif "Nitrogen" in data.status_daun %}
-                                        <span class="badge bg-warning text-dark"><i class="bi bi-exclamation-triangle"></i> Defisiensi N</span>
-                                    {% elif "Kerusakan" in data.status_daun or "Nekrosis" in data.status_daun %}
-                                        <span class="badge bg-danger"><i class="bi bi-x-octagon"></i> Nekrosis (Rusak)</span>
-                                    {% else %}
-                                        <span class="badge bg-info text-dark"><i class="bi bi-info-circle"></i> Defisiensi Ringan</span>
-                                    {% endif %}
-                                </td>
-                                <td>
-                                    <small class="d-block text-success fw-bold">Hijau: {{ data.klorofil_persen }}%</small>
-                                    <small class="d-block text-warning fw-bold">Kuning: {{ data.klorosis_persen }}%</small>
-                                    <small class="d-block" style="color: #8D6E63; font-weight: bold;">Coklat: {{ data.kerusakan_persen }}%</small>
-                                </td>
-                                <td><small class="text-secondary">{{ data.catatan|default:"Belum ada catatan" }}</small></td>
-                                <td class="text-center">
-                                    <div class="btn-group">
-                                        <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editModal{{ data.id }}" title="Edit Catatan">
-                                            <i class="bi bi-pencil-square"></i>
-                                        </button>
-                                        <a href="{% url 'hapus_deteksi' data.id %}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Apakah Anda yakin ingin menghapus data pengujian ini?')" title="Hapus Data">
-                                            <i class="bi bi-trash3-fill"></i>
-                                        </a>
-                                    </div>
-                                </td>
-                            </tr>
+        <div>
 
-                            <div class="modal fade" id="editModal{{ data.id }}" tabindex="-1" aria-labelledby="editModalLabel{{ data.id }}" aria-hidden="true">
-                                <div class="modal-dialog">
-                                    <div class="modal-content">
-                                        <div class="modal-header bg-success text-white">
-                                            <h5 class="modal-title" id="editModalLabel{{ data.id }}"><i class="bi bi-pencil-square"></i> Edit Catatan: {{ data.nama_file }}</h5>
-                                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                                        </div>
-                                        <form action="{% url 'edit_deteksi' data.id %}" method="POST">
-                                            {% csrf_token %}
-                                            <div class="modal-body">
-                                                <div class="mb-3">
-                                                    <label class="form-label fw-bold text-success">Catatan Verifikasi Pakar / Dosen</label>
-                                                    <textarea name="catatan" class="form-control" rows="4" placeholder="Masukkan analisis manual di sini...">{{ data.catatan|default:"" }}</textarea>
-                                                </div>
-                                            </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                                                <button type="submit" class="btn btn-success"><i class="bi bi-save"></i> Simpan Pembaruan</button>
-                                            </div>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
-                            {% empty %}
-                            <tr>
-                                <td colspan="6" class="text-center text-muted py-4">
-                                    <i class="bi bi-inbox fs-3 d-block mb-2"></i> Belum ada data pengujian yang tersimpan di sistem.
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+            <span class="badge bg-success badge-score">
+
+                Total Dataset :
+                {{ total_data }}
+
+            </span>
+
         </div>
+
     </div>
+
+
+    <!-- EVALUASI SISTEM -->
+
+    <div class="row mb-4">
+
+        <!-- ACCURACY -->
+
+        <div class="col-md-3 mb-3">
+
+            <div class="card evaluation-card bg-accuracy">
+
+                <div class="card-body">
+
+                    <h5>Accuracy</h5>
+
+                    <h2>{{ accuracy }}%</h2>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- PRECISION -->
+
+        <div class="col-md-3 mb-3">
+
+            <div class="card evaluation-card bg-precision">
+
+                <div class="card-body">
+
+                    <h5>Precision</h5>
+
+                    <h2>{{ precision }}%</h2>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- RECALL -->
+
+        <div class="col-md-3 mb-3">
+
+            <div class="card evaluation-card bg-recall">
+
+                <div class="card-body">
+
+                    <h5>Recall</h5>
+
+                    <h2>{{ recall }}%</h2>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- F1 SCORE -->
+
+        <div class="col-md-3 mb-3">
+
+            <div class="card evaluation-card bg-f1">
+
+                <div class="card-body">
+
+                    <h5>F1-Score</h5>
+
+                    <h2>{{ f1 }}%</h2>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- TABLE DATASET -->
+
+    <div class="card card-box">
+
+        <div class="card-body">
+
+            <h4 class="mb-4 text-success">
+
+                Dataset Diagnostik HSV
+
+            </h4>
+
+            <div class="table-responsive">
+
+                <table class="table table-bordered table-hover align-middle">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>No</th>
+
+                            <th>Gambar</th>
+
+                            <th>Label Asli</th>
+
+                            <th>Prediksi Sistem</th>
+
+                            <th>Kondisi</th>
+
+                            <th>Hijau</th>
+
+                            <th>Kuning</th>
+
+                            <th>Coklat</th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        {% for item in data %}
+
+                        <tr>
+
+                            <td>
+
+                                {{ forloop.counter }}
+
+                            </td>
+
+                            <td>
+
+                                <img src="{{ item.image.url }}"
+                                     width="100">
+
+                            </td>
+
+                            <td>
+
+                                <span class="badge bg-dark">
+
+                                    {{ item.label }}
+
+                                </span>
+
+                            </td>
+
+                            <td>
+
+                                <span class="badge bg-success">
+
+                                    {{ item.hasil }}
+
+                                </span>
+
+                            </td>
+
+                            <td>
+
+                                {{ item.kondisi }}
+
+                            </td>
+
+                            <td>
+
+                                <div class="progress">
+
+                                    <div class="progress-bar bg-success"
+                                         style="width:{{ item.green_percent }}%">
+
+                                        {{ item.green_percent }}%
+
+                                    </div>
+
+                                </div>
+
+                            </td>
+
+                            <td>
+
+                                <div class="progress">
+
+                                    <div class="progress-bar bg-warning"
+                                         style="width:{{ item.yellow_percent }}%">
+
+                                        {{ item.yellow_percent }}%
+
+                                    </div>
+
+                                </div>
+
+                            </td>
+
+                            <td>
+
+                                <div class="progress">
+
+                                    <div class="progress-bar bg-danger"
+                                         style="width:{{ item.brown_percent }}%">
+
+                                        {{ item.brown_percent }}%
+
+                                    </div>
+
+                                </div>
+
+                            </td>
+
+                        </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
 </div>
 
-<script>
-    const ctxDonut = document.getElementById('grafikTanaman').getContext('2d');
-    new Chart(ctxDonut, {
-        type: 'doughnut',
-        data: {
-            // Label grafik diperbarui menjadi 4 kondisi
-            labels: ['Sehat & Optimal', 'Defisiensi N (Kuning)', 'Nekrosis (Coklat)', 'Defisiensi Ringan'],
-            datasets: [{
-                data: {{ chart_data|safe }},
-                // Warna: Hijau, Kuning, Merah Gelap (Coklat), Biru Muda
-                backgroundColor: ['#198754', '#ffc107', '#dc3545', '#0dcaf0'],
-                borderWidth: 2,
-                hoverOffset: 4
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: { position: 'bottom' }
-            }
-        }
-    });
-</script>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

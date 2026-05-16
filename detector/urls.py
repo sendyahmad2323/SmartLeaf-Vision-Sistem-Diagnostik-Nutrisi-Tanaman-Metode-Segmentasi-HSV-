@@ -6,4 +6,9 @@ urlpatterns = [
     path('dashboard/', views.dashboard, name='dashboard'),
     path('edit/<int:id>/', views.edit_deteksi, name='edit_deteksi'),
     path('hapus/<int:id>/', views.hapus_deteksi, name='hapus_deteksi'),
+    path(
+        'proses-dataset/',
+        views.proses_dataset,
+        name='proses_dataset'
+    ),
 ]

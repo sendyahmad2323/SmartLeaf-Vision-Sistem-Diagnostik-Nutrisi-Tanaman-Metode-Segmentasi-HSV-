@@ -1,13 +1,26 @@
 from django.db import models
 
-class RiwayatDeteksi(models.Model):
-    nama_file = models.CharField(max_length=255)
-    status_daun = models.CharField(max_length=100)
-    klorofil_persen = models.FloatField()
-    klorosis_persen = models.FloatField()
-    kerusakan_persen = models.FloatField(default=0.0)
-    catatan = models.TextField(blank=True, null=True) # Fitur tambahan untuk UPDATE
-    tanggal_uji = models.DateTimeField(auto_now_add=True)
+class DatasetDaun(models.Model):
+
+    LABEL_CHOICES = [
+        ('Nitrogen', 'Nitrogen (N)'),
+        ('Phosphorus', 'Phosphorus (P)'),
+        ('Potassium', 'Potassium (K)'),
+    ]
+
+    image = models.ImageField(upload_to='dataset/')
+    label = models.CharField(max_length=50, choices=LABEL_CHOICES)
+
+    hasil = models.CharField(max_length=100, blank=True)
+    kondisi = models.CharField(max_length=100, blank=True)
+
+    green_percent = models.FloatField(default=0)
+    yellow_percent = models.FloatField(default=0)
+    brown_percent = models.FloatField(default=0)
+
+    accuracy = models.FloatField(default=0)
+
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return self.nama_file
+        return self.label

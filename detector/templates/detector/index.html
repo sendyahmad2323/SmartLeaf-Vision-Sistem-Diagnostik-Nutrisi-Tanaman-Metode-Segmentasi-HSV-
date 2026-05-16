@@ -1,197 +1,82 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SmartLeaf - Plant Diagnostic</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <title>SmartLeaf Vision</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
     <style>
-        body { 
-            background-color: #f4f7f6; 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+
+        body{
+            background:#eef5ee;
         }
-        .navbar-custom { background-color: #1b5e20; }
-        .hero-section {
-            background: linear-gradient(135deg, #1b5e20 0%, #4caf50 100%);
-            color: white;
-            /* Ubah padding di sini: atas 2rem, bawah 4rem (sebelumnya 4rem dan 6rem) */
-            padding: 2rem 0 4rem 0; 
-            border-bottom-left-radius: 50px;
-            border-bottom-right-radius: 50px;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+
+        .hero{
+            background:linear-gradient(to right,#1b5e20,#43a047);
+            color:white;
+            padding:80px;
+            text-align:center;
         }
-        .upload-card {
-            /* Ubah margin-top agar tarikannya pas dengan header yang baru */
-            margin-top: -40px; 
-            border-radius: 15px;
-            border: none;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.08);
-            background: #ffffff;
+
+        .box{
+            background:white;
+            padding:30px;
+            border-radius:15px;
+            margin-top:-30px;
+            box-shadow:0 3px 12px rgba(0,0,0,0.1);
         }
-        .result-card {
-            border-radius: 15px;
-            border: none;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-            transition: transform 0.3s ease;
-        }
-        .result-card:hover { transform: translateY(-5px); }
-        .img-preview { 
-            border-radius: 10px; 
-            height: 220px; 
-            object-fit: cover; 
-            width: 100%; 
-            border: 3px solid #e9ecef;
-        }
-        .btn-green { 
-            background-color: #2e7d32; color: white; border-radius: 8px;
-            padding: 12px; font-weight: 600;
-        }
-        .btn-green:hover { background-color: #1b5e20; color: white; }
-        .progress { height: 10px; border-radius: 5px; }
+
     </style>
+
 </head>
 <body>
 
-<nav class="navbar navbar-expand-lg navbar-dark navbar-custom shadow-sm">
-    <div class="container">
-        <a class="navbar-brand fw-bold" href="/"><i class="bi bi-tree-fill"></i> SmartLeaf</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ms-auto">
-                <li class="nav-item"><a class="nav-link active fw-bold" href="/">Pemindai AI</a></li>
-                <li class="nav-item"><a class="nav-link fw-bold" href="/dashboard/">Data & Statistik</a></li>
-            </ul>
-        </div>
-    </div>
-</nav>
+<div class="hero">
 
-<header class="hero-section text-center mb-5">
-    <div class="container">
-        <h1 class="fw-bold display-5 mb-0"><i class="bi bi-tree-fill"></i> SmartLeaf Vision</h1>
-        <p class="mt-2 opacity-75">Sistem Diagnostik Nutrisi Tanaman (Metode Segmentasi HSV)</p>
-    </div>
-</header>
+    <h1>🌿 SmartLeaf Vision</h1>
 
-<div class="container">
-    <div class="row justify-content-center mb-5">
-        <div class="col-md-8">
-            <div class="card upload-card p-4">
-                <div class="text-center mb-4">
-                    <i class="bi bi-cloud-arrow-up-fill text-success" style="font-size: 3rem;"></i>
-                    <h4 class="fw-bold text-success mt-2">Unggah Sampel Daun</h4>
-                </div>
-                <form method="POST" enctype="multipart/form-data">
-                    {% csrf_token %}
-                    <div class="mb-4">
-                        <input class="form-control form-control-lg" type="file" id="images" name="images" accept="image/*" multiple required>
-                    </div>
-                    <button type="submit" class="btn btn-green w-100 shadow-sm">
-                        <i class="bi bi-search"></i> Proses Ekstraksi Visi Komputer
-                    </button>
-                </form>
-            </div>
-        </div>
-    </div>
+    <p>
+        Sistem Diagnostik Nutrisi Daun Tanaman
+        Metode Segmentasi HSV
+    </p>
 
-    {% if results %}
-    <div class="d-flex align-items-center mb-4 border-bottom pb-2">
-        <i class="bi bi-file-earmark-medical-fill text-success fs-3 me-2"></i>
-        <h3 class="text-success fw-bold mb-0">Laporan Diagnostik</h3>
-    </div>
-    
-    <div class="row">
-        {% for item in results %}
-        <div class="col-lg-6 mb-4">
-            <div class="card result-card h-100">
-                <div class="card-body p-4">
-                    <div class="row">
-                        <div class="col-md-5 mb-3 mb-md-0">
-                            <img src="{{ item.url }}" alt="Daun" class="img-preview shadow-sm">
-                            <div class="mt-2 text-center text-muted small fw-bold">
-                                <i class="bi bi-image"></i> {{ item.name }}
-                            </div>
-                        </div>
-                        
-                        <div class="col-md-7">
-                            <div class="alert alert-{{ item.color_class }} py-2 px-3 fw-bold mb-3 d-flex align-items-center">
-                                <i class="bi bi-info-circle-fill me-2"></i> {{ item.status }}
-                            </div>
-                            
-                            <div class="mb-3">
-                                <small class="text-muted fw-bold d-flex justify-content-between">
-                                    <span>Klorofil (Hijau)</span> <span>{{ item.green_pct }}%</span>
-                                </small>
-                                <div class="progress mb-2">
-                                    <div class="progress-bar bg-success" style="width: {{ item.green_pct }}%;"></div>
-                                </div>
-                                <small class="text-muted fw-bold d-flex justify-content-between">
-                                    <span>Klorosis (Kuning)</span> <span>{{ item.yellow_pct }}%</span>
-                                </small>
-                                <div class="progress">
-                                    <div class="progress-bar bg-warning" style="width: {{ item.yellow_pct }}%;"></div>
-                                </div>
-                                <small class="text-muted fw-bold d-flex justify-content-between mt-2">
-                                    <span>Kerusakan (Coklat)</span> <span>{{ item.brown_pct }}%</span>
-                                </small>
-                                <div class="progress mb-2">
-                                    <div class="progress-bar" style="background-color: #8D6E63; width: {{ item.brown_pct }}%;"></div>
-                                </div>
-                            </div>
-
-                            <div class="mt-3 pt-2 border-top">
-                                <small class="fw-bold text-dark"><i class="bi bi-bar-chart-line"></i> Histogram Fitur RGB</small>
-                                <canvas id="histChart-{{ item.id_loop }}" height="120"></canvas>
-                            </div>
-                            
-                        </div>
-                    </div>
-                    
-                    <div class="bg-light p-3 rounded-3 border mt-3">
-                        <h6 class="fw-bold text-dark mb-1"><i class="bi bi-prescription2 text-primary"></i> Rekomendasi Tindakan:</h6>
-                        <p class="card-text text-muted small mb-0">{{ item.advice }}</p>
-                    </div>
-
-                </div>
-            </div>
-        </div>
-
-        <script>
-            document.addEventListener("DOMContentLoaded", function() {
-                const ctx = document.getElementById('histChart-{{ item.id_loop }}').getContext('2d');
-                new Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        labels: Array.from({length: 256}, (_, i) => i),
-                        datasets: [
-                            { label: 'R', data: {{ item.hist_r|safe }}, borderColor: '#dc3545', borderWidth: 1, pointRadius: 0 },
-                            { label: 'G', data: {{ item.hist_g|safe }}, borderColor: '#198754', borderWidth: 1, pointRadius: 0 },
-                            { label: 'B', data: {{ item.hist_b|safe }}, borderColor: '#0d6efd', borderWidth: 1, pointRadius: 0 }
-                        ]
-                    },
-                    options: { 
-                        responsive: true, 
-                        scales: { x: { display: false }, y: { display: false } },
-                        plugins: { legend: { display: true, position: 'bottom', labels: { boxWidth: 10 } } }
-                    }
-                });
-            });
-        </script>
-        {% endfor %}
-    </div>
-    {% endif %}
 </div>
 
-<footer class="text-center text-muted py-4 mt-5 border-top">
-    <div class="container">
-        <small class="fw-bold d-block mb-1">Dikembangkan untuk Analisis Pertanian Digital</small>
-        <small>© 2026 SmartLeaf System Engine</small>
-    </div>
-</footer>
+<div class="container mt-5">
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <div class="box text-center">
+
+        <h3 class="text-success mb-4">
+
+            Dataset Kaggle SmartLeaf Vision
+
+        </h3>
+
+        <p>
+            Total Dataset:
+            <b>{{ total }}</b>
+        </p>
+
+        <a href="/proses-dataset/"
+           class="btn btn-success btn-lg">
+
+            Proses Dataset Kaggle
+
+        </a>
+
+        <a href="/dashboard/"
+           class="btn btn-dark btn-lg">
+
+            Dashboard Hasil
+
+        </a>
+
+    </div>
+
+</div>
+
 </body>
 </html>
