@@ -8,9 +8,10 @@ class DatasetDaun(models.Model):
         ('Potassium', 'Potassium (K)'),
     ]
 
-    image = models.ImageField(upload_to='dataset/')
+    # Menggunakan CharField karena kita hanya menyimpan path teks dari views.py
+    image = models.CharField(max_length=255)
+    
     label = models.CharField(max_length=50, choices=LABEL_CHOICES)
-
     hasil = models.CharField(max_length=100, blank=True)
     kondisi = models.CharField(max_length=100, blank=True)
 
@@ -18,9 +19,10 @@ class DatasetDaun(models.Model):
     yellow_percent = models.FloatField(default=0)
     brown_percent = models.FloatField(default=0)
 
-    accuracy = models.FloatField(default=0)
+    # Disimpan jika Anda ingin melacak confidence/akurasi setiap gambar
+    accuracy = models.FloatField(default=0) 
 
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return self.label
+        return f"{self.label} - Prediksi: {self.hasil}"
